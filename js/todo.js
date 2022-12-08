@@ -2,11 +2,14 @@ const todoForm = document.getElementById('todo-form');
 const todoInput = document.querySelector('#todo-form input');
 const todoList = document.getElementById('todo-list');
 
-const toDos = []; //localStorage에 정보 저장. 그러나 localStorage에 배열 저장 x.
+const TODOS_KEY = 'todos';
+
+const toDos = []; //localStorage에 정보 저장.
 
 //4. 저장 기능
-function saveToDo() {
-
+function saveToDos() {
+    //로컬스토리지에서 불러오기 위해 문자열화.
+    localStorage.setItem(TODOS_KEY, JSON.stringify(toDos));
 }
 
 //3. 삭제 기능
@@ -15,7 +18,7 @@ function deleteToDo(event) {
     li.remove();
 }
 
-//2. 텍스트 입력 시, 동적으로 list 생성
+//2. 텍스트 submit 시, 동적으로 list 생성
 function paintToDo(newTodo) {
     const li = document.createElement('li');
     const span = document.createElement('span');
@@ -25,9 +28,13 @@ function paintToDo(newTodo) {
     li.append(span);
     li.append(button);
     todoList.append(li);
+
+    //3. 삭제 버튼 클릭 시, list 삭제
     button.addEventListener('click', deleteToDo);
+
+    //4. submit 시, localStorage에 저장
     toDos.push(newTodo);
-    console.log(toDos);
+    saveToDos();
 }
 
 //1. submit 기본 기능 금지, paintTodo 실행.
@@ -39,3 +46,10 @@ function handleToDoSubmit(event) {
 }
 
 todoForm.addEventListener('submit', handleToDoSubmit);
+
+const savedToDos = localStorage.getItem(TODOS_KEY);
+//로컬스토리지에 저장된 값 불러와 화면에 그리기
+if (savedToDos !== null) {
+    const parsedToDos = JSON.parse(savedToDos);
+    parsedToDos.forEach(paintToDo);
+}
